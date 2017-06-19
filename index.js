@@ -178,7 +178,7 @@ matter.stringify = function(str, data, options) {
     throw new Error('gray-matter dumper must be a function');
   }
   res += (delims[1] || delims[0]) + '\n';
-  res += str + '\n';
+  res += str;
   return res;
 };
 
