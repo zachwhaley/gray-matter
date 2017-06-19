@@ -159,16 +159,24 @@ matter.read = function(fp, options) {
  *
  * @param {String} `str` The content string to append to stringified front-matter.
  * @param {Object} `data` Front matter to stringify.
- * @param {Object} `options` Options to pass to js-yaml
+ * @param {Object} `options` Options to pass to Dumper
+ *   @option {Function} [options] `dumper` Dumper function to use. [js-yaml] is the default.
  * @return {String}
  * @api public
  */
 
 matter.stringify = function(str, data, options) {
-  var delims = arrayify(options && options.delims || '---');
+  var opts = options || {};
+  var delims = arrayify(opts.delims || '---');
   var res = '';
   res += delims[0] + '\n';
-  res += YAML.safeDump(data, options);
+  var fn = opts.dumper || YAML.safeDump;
+  if (typeof fn === 'function') {
+    // run the dumper on the data string
+    res += fn(data, opts)
+  } else {
+    throw new Error('gray-matter dumper must be a function');
+  }
   res += (delims[1] || delims[0]) + '\n';
   res += str + '\n';
   return res;
